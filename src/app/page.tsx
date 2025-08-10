@@ -183,18 +183,15 @@ export default function Home() {
   const [resources, setResources] = useState<Resource[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 🔹 Login states
   const [showLogin, setShowLogin] = useState(true);
   const [name, setName] = useState('');
   const [course, setCourse] = useState('');
 
-  // Filter resources
   useEffect(() => {
     const filteredResources = resourcesData.filter((item) => item.subject === selectedCategory);
     setResources(filteredResources);
   }, [selectedCategory]);
 
-  // Menu scroll lock
   useEffect(() => {
     if (isMenuOpen && window.innerWidth < 768) {
       document.body.style.overflow = 'hidden';
@@ -206,7 +203,6 @@ export default function Home() {
     };
   }, [isMenuOpen]);
 
-  // Show popup only first visit
   useEffect(() => {
     const hasLoggedIn = localStorage.getItem('hasLoggedIn');
     if (hasLoggedIn) {
@@ -259,7 +255,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Header */}
       <header className="w-full px-4 md:px-12 py-4 flex justify-between items-center border-b bg-[#FFEDD5] shadow-sm">
         <Link href="/" className="cursor-pointer transition-transform duration-200 hover:scale-105">
           <h1 style={{ fontFamily: "'Press Start 2P', cursive", color: '#FC6D2F', fontSize: '24px', margin: 0 }}>
