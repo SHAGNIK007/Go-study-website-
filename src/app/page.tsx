@@ -174,6 +174,36 @@ const resourcesData: Resource[] = [
     description: 'some management stuff  u wont need anyways',
     thumbnail: '/Mngm2.png',
   },
+  {
+    id: 16,
+    title: 'Math04: Derivatives',
+    subject: 'MATHEMATICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/SpY7wHiLiEQ',
+    pdf: 'no pdf',
+    description: 'prof didnt have his mic turned ON',
+    thumbnail: '/mathd6.png',
+  },
+    {
+    id: 17,
+    title: 'E03: Indianism and common errors',
+    subject: 'ENGLISH',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/fluFwsJeFv8',
+    pdf: 'no pdf',
+    description: 'get to know how to speak english',
+    thumbnail: '/engd6.png',
+  },
+    {
+    id: 18,
+    title: 'CS03: Projects of seniors',
+    subject: 'CSE',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/qI1xBWG9L7o',
+    pdf: 'no pdf ',
+    description: 'projects of seniors nothing to do anything with us',
+    thumbnail: '/csd6.png',
+  },
 ];
 
 export default function Home() {
