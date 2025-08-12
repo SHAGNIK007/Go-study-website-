@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Resource {
   id: number;
@@ -16,6 +17,11 @@ interface Resource {
   homework?: string;
   thumbnail?: string;
   cred?: string;
+}
+
+interface UserProfile {
+  username: string;
+  avatar_url: string;
 }
 
 const categories = ['CSE', 'ECE', 'MATHEMATICS', 'ENGLISH', 'PHYSICS', 'CHEMISTRY', 'MANAGEMENT'];
@@ -181,100 +187,72 @@ export default function Home() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('CSE');
   const [resources, setResources] = useState<Resource[]>([]);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const [showLogin, setShowLogin] = useState(true);
-  const [name, setName] = useState('');
-  const [course, setCourse] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const filteredResources = resourcesData.filter((item) => item.subject === selectedCategory);
-    setResources(filteredResources);
-  }, [selectedCategory]);
+    async function fetchUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username, avatar_url')
+          .eq('id', user.id)
+          .single();
 
-  useEffect(() => {
-    if (isMenuOpen && window.innerWidth < 768) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
+        let avatarUrl = '/default-avatar.png';
+        if (profile?.avatar_url) {
+          if (!profile.avatar_url.startsWith('http')) {
+            const filePath = profile.avatar_url.replace('avatar/', '');
+            const { data } = supabase.storage.from('avatar').getPublicUrl(filePath);
+            avatarUrl = data.publicUrl || '/default-avatar.png';
+          } else {
+            avatarUrl = profile.avatar_url;
+          }
+        }
+
+        setUser({
+          username: profile?.username || 'User',
+          avatar_url: avatarUrl,
+        });
+      }
     }
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [isMenuOpen]);
-
-  useEffect(() => {
-    const hasLoggedIn = localStorage.getItem('hasLoggedIn');
-    if (hasLoggedIn) {
-      setShowLogin(false);
-    }
+    fetchUser();
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    localStorage.setItem('hasLoggedIn', 'true');
-    localStorage.setItem('studentName', name);
-    localStorage.setItem('studentCourse', course);
-    setShowLogin(false);
+  useEffect(() => {
+    let filtered = resourcesData.filter((item) => item.subject === selectedCategory);
+    if (searchTerm.trim()) {
+      filtered = filtered.filter((item) =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.subject.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    setResources(filtered);
+  }, [selectedCategory, searchTerm]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    router.push('/login');
   };
 
   return (
-    <div className="min-h-screen bg-[#FFEDD5] text-black relative">
-      {/* 🔹 Login Popup */}
-      {showLogin && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#FFEDD5] p-6 rounded-2xl shadow-lg w-96 border-2 border-[#FC6D2F]">
-            <h2 className="text-2xl font-bold mb-4 text-center text-[#FC6D2F]">
-              Welcome to GOSTUDY
-            </h2>
-            <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="border border-[#FC6D2F] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FC6D2F]"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Enter your college course"
-                value={course}
-                onChange={(e) => setCourse(e.target.value)}
-                className="border border-[#FC6D2F] p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FC6D2F]"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-[#FC6D2F] text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition"
-              >
-                Continue
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      <header className="w-full px-4 md:px-12 py-4 flex justify-between items-center border-b bg-[#FFEDD5] shadow-sm">
-        <Link href="/" className="cursor-pointer transition-transform duration-200 hover:scale-105">
-          <h1 style={{ fontFamily: "'Press Start 2P', cursive", color: '#FC6D2F', fontSize: '24px', margin: 0 }}>
-            GOSTUDY.COM
-          </h1>
+    <div className="flex flex-col min-h-screen bg-[#FFEDD5] text-black font-sans antialiased">
+   
+      <header className="w-full px-4 md:px-8 py-3 flex justify-between items-center border-b border-[#E2B991] bg-[#F7E6D4] shadow-sm">
+ 
+        <Link
+          href="/"
+          className="text-lg font-semibold text-[#D15555] hover:text-[#B44646] transition-colors duration-300"style={{ fontFamily: "'Press Start 2P', cursive" }}
+        >
+          GOSTUDY.COM
         </Link>
-        <div className="md:hidden">
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-black focus:outline-none"
-            aria-label="Toggle menu"
-          >
-            <div className="w-6 h-5 flex flex-col justify-between">
-              <span className={`w-full h-0.5 bg-black transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
-              <span className={`w-full h-0.5 bg-black transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
-              <span className={`w-full h-0.5 bg-black transition-all duration-300 ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
-            </div>
-          </button>
-        </div>
-        <nav className="hidden md:flex space-x-4 md:space-x-6">
+
+        
+        <nav className="hidden md:flex space-x-6 text-md font-medium">
           {['Home', 'Lectures', 'Books', 'Notes'].map((link) => {
             const href = link === 'Home' ? '/' : `/${link.toLowerCase()}`;
             const isActive = pathname === href;
@@ -282,73 +260,184 @@ export default function Home() {
               <Link
                 key={link}
                 href={href}
-                className={`text-sm md:text-base font-semibold px-3 py-1 rounded border transition ${
-                  isActive ? 'bg-[#FC6D2F] text-black border-black' : 'text-black hover:text-blue-600'
+                className={`px-3 py-1 rounded-md transition-all duration-300 ${
+                  isActive
+                    ? 'bg-[#D15555] text-white'
+                    : 'text-[#5B4C3A] hover:bg-[#FFE4C4]'
                 }`}
               >
-                {link.toUpperCase()}
+                {link}
               </Link>
             );
           })}
         </nav>
+
+       
+        <div className="flex items-center gap-3">
+          
+          <div className="hidden md:block">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="border border-[#D9A679] bg-[#FFF5E6] rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#D15555] transition-all duration-300"
+              style={{ fontFamily: "'Press Start 2P', cursive" }}
+            />
+          </div>
+
+
+          {user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="flex items-center gap-2"
+              >
+                <div className="relative w-10 h-10 rounded-full cursor-pointer border border-[#D9A679] bg-[#FFF5E6] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                  <Image
+                    src={user.avatar_url}
+                    alt="avatar"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <span className="text-md font-bold text-[#5B4C3A] hidden md:block">{user.username}</span>
+              </button>
+
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 bg-[#FFF5E6] border border-[#D9A679] rounded-md shadow-md w-40 z-10 overflow-hidden">
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
+                  >
+                    Edit Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="hidden md:flex gap-2">
+              <Link
+                href="/login"
+                className="px-3 py-1 bg-[#FFF5E6] border border-[#D9A679] text-sm text-[#5B4C3A] rounded-md hover:bg-[#FFE4C4] transition-all duration-300"
+              >
+                Login
+              </Link>
+              <Link
+                href="/signup"
+                className="px-3 py-1 bg-[#D15555] text-sm text-white rounded-md hover:bg-[#B44646] transition-all duration-300"
+              >
+                Signup
+              </Link>
+            </div>
+          )}
+
+ 
+          <div className="md:hidden">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[#5B4C3A] focus:outline-none">
+              <div className="w-6 h-5 flex flex-col justify-between">
+                <span className={`w-full h-0.5 bg-[#5B4C3A] rounded transition-all duration-300 ease-in-out ${isMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+                <span className={`w-full h-0.5 bg-[#5B4C3A] rounded transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-0' : ''}`}></span>
+                <span className={`w-full h-0.5 bg-[#5B4C3A] rounded transition-all duration-300 ease-in-out ${isMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+              </div>
+            </button>
+          </div>
+        </div>
       </header>
 
-      {/* Mobile nav */}
-      <nav
-        className={`${isMenuOpen ? 'flex flex-col slide-in' : 'hidden'} md:hidden fixed top-0 right-0 bg-black text-white p-6 shadow-md rounded-l-lg w-1/2 h-screen z-20`}
+     
+      <div
+        className={`md:hidden bg-[#FFF5E6] border-b border-[#D9A679] overflow-hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+        }`}
       >
-        {['Home', 'Lectures', 'Books', 'Notes'].map((link) => {
-          const href = link === 'Home' ? '/' : `/${link.toLowerCase()}`;
-          const isActive = pathname === href;
-          return (
-            <Link
-              key={link}
-              href={href}
-              onClick={() => setIsMenuOpen(false)}
-              className={`block py-3 text-sm font-semibold px-4 rounded border transition ${
-                isActive ? 'bg-[#FC6D2F] text-black border-black' : 'hover:text-blue-600'
-              }`}
-              style={{ marginBottom: '1rem' }}
-            >
-              {link.toUpperCase()}
-            </Link>
-          );
-        })}
-      </nav>
+        <div className="px-4 py-4 space-y-2">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full border border-[#D9A679] bg-white rounded-md px-3 py-1 text-sm"
+          />
+          {['Home', 'Lectures', 'Books', 'Notes'].map((link) => {
+            const href = link === 'Home' ? '/' : `/${link.toLowerCase()}`;
+            return (
+              <Link
+                key={link}
+                href={href}
+                onClick={() => setIsMenuOpen(false)}
+                className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md"
+              >
+                {link}
+              </Link>
+            );
+          })}
+          {!user && (
+            <>
+              <Link href="/login" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
+                Login
+              </Link>
+              <Link href="/signup" className="block px-3 py-2 bg-[#D15555] text-sm text-white hover:bg-[#B44646] transition-colors duration-300 rounded-md">
+                Signup
+              </Link>
+            </>
+          )}
+          {user && (
+            <>
+              <Link href="/profile" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
+                Edit Profile
+              </Link>
+              <button onClick={handleLogout} className="block w-full px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md text-left">
+                Logout
+              </button>
+            </>
+          )}
+        </div>
+      </div>
 
-      {/* Main content */}
-      <main className="container mx-auto p-6">
-        <div className="flex flex-wrap gap-3 justify-center mb-8">
+ 
+      <main className="flex-1 container mx-auto p-4 md:p-6">
+      
+        <div className="flex flex-wrap gap-2 justify-center mb-6">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 border rounded-full font-medium text-sm ${
-                selectedCategory === cat ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-100'
-              } transition`}
+              className={`px-3 py-1 border rounded-full text-md cursor-pointer font-medium transition-all duration-300 ${
+                selectedCategory === cat ? 'bg-[#D15555] text-white border-[#D15555]' : 'bg-[#FFF5E6] text-[#5B4C3A] border-[#D9A679] hover:bg-[#FFE4C4]'
+              }`}
             >
               {cat}
             </button>
           ))}
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+       
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {resources.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-lg shadow hover:shadow-md transition overflow-hidden cursor-pointer group"
+              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden cursor-pointer group border border-[#E2B991]"
               onClick={() => router.push(`/lectures/${encodeURIComponent(item.title)}`)}
             >
-              <div className="relative w-full h-40">
+              <div className="relative w-full h-32 md:h-40">
                 <Image
                   src={item.thumbnail || '/video-placeholder.jpg'}
                   alt={item.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-200"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300 ease-in-out"
                 />
               </div>
-              <div className="p-3 relative">
-                <h3 className="font-semibold text-sm text-center">{item.title}</h3>
-                <span className="absolute bottom-2 right-2 text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">
+              <div className="p-3">
+                <h3 className="font-semibold text-sm text-center mb-1">{item.title}</h3>
+                <p className="text-xs text-gray-600 text-center line-clamp-2">{item.description}</p>
+                <span className="absolute bottom-2 right-2 text-xs text-[#5B4C3A] bg-[#FFF5E6] px-1.5 py-0.5 rounded-full border border-[#D9A679]">
                   {item.type.toUpperCase()}
                 </span>
               </div>
@@ -357,9 +446,10 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="w-full bg-[#FFEDD5] text-gray-500 p-2 fixed bottom-0 left-0 text-center">
-        <p className="text-sm font-semibold">Made For VIT-AP study resources| v1.0 🔥</p>
-        <p className="text-sm font-semibold">Made With ❤️ by Srijoy & Shagnik (1st Year Students)</p>
+  
+      <footer className="w-full bg-[#F7E6D4] text-[#5B4C3A] p-3 text-center border-t border-[#E2B991] shadow-sm mt-auto">
+        <p className="text-sm font-medium">Made For VIT-AP study resources | v1.1</p>
+        <p className="text-sm font-medium">Made With ❤️ by Srijoy & Shagnik (1st Year Students)</p>
       </footer>
     </div>
   );
