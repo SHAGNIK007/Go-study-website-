@@ -1,93 +1,73 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import Link from 'next/link';
+import Image from 'next/image';
 
-export default function ConfirmEmail() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+export default function ConfirmEmailPage() {
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+  const [email, setEmail] = useState('');
 
-  const handleResendConfirmation = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
+  useEffect(() => {
+    async function fetchSession() {
+      const { data } = await supabase.auth.getSession();
+      setEmail(data.session?.user.email ?? '');
+    }
+    fetchSession();
+  }, []);
+
+  const handleResend = async () => {
     setLoading(true);
-
+    setErrorMsg('');
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      if (!email) {
+        setErrorMsg('Email not found.');
+        setLoading(false);
+        return;
+      }
+      // Send password reset email instead of signUp
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback`,
       });
-
       if (error) throw error;
-
-      setMessage('Confirmation email sent! Please check your inbox (and spam folder).');
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'Something went wrong while sending the confirmation email.');
+      alert('Password reset email sent! Please check your inbox.');
+    } catch (err) {
+      if (err instanceof Error) setErrorMsg(err.message);
+      else setErrorMsg('Failed to send email.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FFEDD5] text-[#5B4C3A] font-sans antialiased justify-center items-center p-6">
-      <div className="w-full max-w-sm">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2 text-[#5B4C3A] font-['Press_Start_2P']">
-          Confirm Your Email
-        </h1>
-        <p className="text-sm text-gray-700 mb-6">
-          Please enter your email to resend the confirmation link and access GoStudy.
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#FFEDD5] text-[#5B4C3A] font-sans p-6">
+      <div className="max-w-md w-full bg-[#FFF5E6] border border-[#D9A679] rounded-lg p-8 text-center shadow-md">
+        <Image
+          src="/email-sent.svg"
+          alt="Email sent"
+          width={120}
+          height={120}
+          className="mx-auto mb-6"
+          priority
+        />
+        <h1 className="text-2xl font-bold mb-2">Confirm your email</h1>
+        <p className="mb-4">
+          We have sent a confirmation link to <strong>{email || 'your email'}</strong>.
+          Please check your inbox and click the link to verify your account.
         </p>
 
-        {message && (
-          <p className="text-green-600 mb-4 text-sm bg-[#FFF5E6] p-2 rounded-md border border-[#D9A679]">
-            {message}
-          </p>
+        {errorMsg && (
+          <p className="text-[#D15555] mb-4 bg-[#FFE4C4] p-2 rounded-md border border-[#D9A679]">{errorMsg}</p>
         )}
-        {error && (
-          <p className="text-[#D15555] mb-4 text-sm bg-[#FFF5E6] p-2 rounded-md border border-[#D9A679]">
-            {error}
-          </p>
-        )}
 
-        <form onSubmit={handleResendConfirmation}>
-          <input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border border-[#D9A679] rounded-md p-3 w-full mb-4 placeholder-gray-500 bg-[#FFF5E6] focus:outline-none focus:ring-2 focus:ring-[#D15555] transition-all duration-300"
-            required
-          />
-
-          <button
-            type="submit"
-            className="bg-[#D15555] text-white w-full py-2 rounded-md font-semibold hover:bg-[#B44646] transition-all duration-300"
-            disabled={loading}
-          >
-            {loading ? 'Sending...' : 'Resend Confirmation Email'}
-          </button>
-        </form>
-
-        <p className="text-sm text-gray-600 mt-4 text-center">
-          Already confirmed?{' '}
-          <Link href="/login" className="text-[#D15555] hover:underline">
-            Log in
-          </Link>
-        </p>
-        <p className="text-sm text-gray-600 mt-2 text-center">
-          Need an account?{' '}
-          <Link href="/signup" className="text-[#D15555] hover:underline">
-            Sign up
-          </Link>
-        </p>
+        <button
+          onClick={handleResend}
+          disabled={loading}
+          className="bg-[#D15555] text-white py-2 px-4 rounded-md hover:bg-[#B44646] transition-all duration-300"
+        >
+          {loading ? 'Sending email...' : 'Send password reset email'}
+        </button>
       </div>
     </div>
   );

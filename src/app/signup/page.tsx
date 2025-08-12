@@ -41,14 +41,14 @@ export default function SignupPage() {
     return () => clearInterval(interval);
   }, [slides.length]);
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setErrorMsg('');
     setUserExists(false);
 
     try {
-      const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -64,7 +64,7 @@ export default function SignupPage() {
         throw signUpError;
       }
 
-      if (user) {
+      if (data?.user) {
         const avatarList = [
           '/avatars/img1.jpg',
           '/avatars/img2.jpg',
@@ -74,25 +74,26 @@ export default function SignupPage() {
         const randomAvatar = avatarList[Math.floor(Math.random() * avatarList.length)];
 
         await supabase.from('profiles').insert({
-          id: user.id,
-          email: user.email,
-          username: user.email?.split('@')[0] || 'User',
+          id: data.user.id,
+          email: data.user.email,
+          username: data.user.email?.split('@')[0] || 'User',
           avatar_url: randomAvatar,
           bio: '',
         });
 
-
         router.push('/confirm-email');
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      setErrorMsg(err.message || 'Something went wrong');
+      if (err instanceof Error) setErrorMsg(err.message);
+      else setErrorMsg('Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
   const signInWithProvider = async (provider: 'discord') => {
+    setErrorMsg('');
     const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : '';
 
     const { error } = await supabase.auth.signInWithOAuth({
@@ -138,6 +139,7 @@ export default function SignupPage() {
                   index === currentSlide ? 'bg-[#D15555] w-4' : 'bg-white/50'
                 }`}
                 onClick={() => setCurrentSlide(index)}
+                aria-label={`Slide ${index + 1}`}
               />
             ))}
           </div>
@@ -154,18 +156,21 @@ export default function SignupPage() {
           <button
             onClick={() => signInWithProvider('discord')}
             className="flex items-center justify-center w-full border border-[#D9A679] rounded-md py-2 mb-3 bg-[#FFF5E6] text-[#5B4C3A] hover:bg-[#FFE4C4] transition-all duration-300"
+            type="button"
           >
             <FaDiscord className="text-[#5865F2] mr-2" /> Continue with Discord
           </button>
 
           <div className="flex items-center my-4">
-            <div className="flex-grow border-t border-[#D9A679]"></div>
+            <div className="flex-grow border-t border-[#D9A679]" />
             <span className="px-3 text-gray-600 text-sm">or sign up with</span>
-            <div className="flex-grow border-t border-[#D9A679]"></div>
+            <div className="flex-grow border-t border-[#D9A679]" />
           </div>
 
           {errorMsg && (
-            <p className="text-[#D15555] mb-4 text-sm bg-[#FFF5E6] p-2 rounded-md border border-[#D9A679]">{errorMsg}</p>
+            <p className="text-[#D15555] mb-4 text-sm bg-[#FFF5E6] p-2 rounded-md border border-[#D9A679]">
+              {errorMsg}
+            </p>
           )}
 
           {userExists && (
@@ -188,6 +193,7 @@ export default function SignupPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="border border-[#D9A679] rounded-md p-3 w-full mb-4 placeholder-gray-500 bg-[#FFF5E6] focus:outline-none focus:ring-2 focus:ring-[#D15555] transition-all duration-300"
               required
+              autoComplete="email"
             />
             <input
               type="password"
@@ -196,9 +202,8 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="border border-[#D9A679] rounded-md p-3 w-full mb-4 placeholder-gray-500 bg-[#FFF5E6] focus:outline-none focus:ring-2 focus:ring-[#D15555] transition-all duration-300"
               required
+              autoComplete="new-password"
             />
-
-          
 
             <button
               type="submit"

@@ -53,11 +53,11 @@ export default function Login() {
 
       if (loginError) throw loginError;
 
-
       router.push('/');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'Something went wrong');
+      if (err instanceof Error) setError(err.message);
+      else setError('Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -76,9 +76,10 @@ export default function Login() {
       });
 
       if (error) throw error;
-    } catch (err: any) {
-      console.error('OAuth login error:', err.message);
-      setError(err.message || 'Something went wrong with Discord login');
+    } catch (err: unknown) {
+      console.error('OAuth login error:', err);
+      if (err instanceof Error) setError(err.message);
+      else setError('Something went wrong with Discord login');
       setLoading(false);
     }
   };
@@ -163,8 +164,6 @@ export default function Login() {
               className="border border-[#D9A679] rounded-md p-3 w-full mb-4 placeholder-gray-500 bg-[#FFF5E6] focus:outline-none focus:ring-2 focus:ring-[#D15555] transition-all duration-300"
               required
             />
-
-          
 
             <button
               type="submit"

@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { User } from '@supabase/supabase-js';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('/default-avatar.png');
   const [bio, setBio] = useState('');
@@ -101,13 +102,14 @@ export default function ProfilePage() {
       const { error } = await supabase
         .from('profiles')
         .update({ username, avatar_url: avatarUrl, bio })
-        .eq('id', user.id);
+        .eq('id', user?.id);
 
       if (error) throw error;
 
       router.push('/');
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message);
+      else setError('Something went wrong');
     } finally {
       setLoading(false);
     }
@@ -115,7 +117,7 @@ export default function ProfilePage() {
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (file && user) {
       setLoading(true);
       try {
         const fileExt = file.name.split('.').pop();
@@ -128,8 +130,9 @@ export default function ProfilePage() {
 
         const { data } = supabase.storage.from('avatar').getPublicUrl(fileName);
         setAvatarUrl(data.publicUrl);
-      } catch (err: any) {
-        setError(err.message || 'Failed to upload avatar');
+      } catch (err: unknown) {
+        if (err instanceof Error) setError(err.message);
+        else setError('Failed to upload avatar');
       } finally {
         setLoading(false);
       }
