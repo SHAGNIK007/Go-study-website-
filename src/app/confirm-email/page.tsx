@@ -26,7 +26,7 @@ export default function ConfirmEmailPage() {
         setLoading(false);
         return;
       }
-      // Send password reset email instead of signUp
+    
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/callback`,
       });
