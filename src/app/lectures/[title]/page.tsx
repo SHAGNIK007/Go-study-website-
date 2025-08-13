@@ -209,6 +209,36 @@ const videoData = [
     description: 'projects of seniors nothing to do anything with us',
     thumbnail: '/csd6.png',
   },
+  {
+    id: 19,
+    title: 'CS04: World cinematic universe coding ',
+    subject: 'CSE',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/twwl8vrD_tM',
+    pdf: '/pdfs/CSD7.pdf',
+    description: 'some coding basics in python',
+    thumbnail: '/CSD7.png',
+  },
+      {
+    id: 20,
+    title: 'E04: Communication skills',
+    subject: 'ENGLISH',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/ju1EvvS5_Ho',
+    pdf: '/pdfs/ENGD7.pdf ',
+    description: 'get to know how to communicate',
+    thumbnail: '/ED7.png',
+  },
+      {
+    id: 21,
+    title: 'Math05: Integration',
+    subject: 'MATHEMATICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/02WcRfGV2-g',
+    pdf: '/pdfs/MD7.pdf ',
+    description: 'just integration',
+    thumbnail: '/MD7.png',
+  },
 ];
 
 export default function LecturePage() {
