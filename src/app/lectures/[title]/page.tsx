@@ -218,6 +218,8 @@ const videoData = [
     pdf: '/pdfs/CSD7.pdf',
     description: 'some coding basics in python',
     thumbnail: '/CSD7.png',
+    handwrittenNotes: '/pdfs/cse4.pdf',
+    cred:"Aryan Mishra ",
   },
       {
     id: 20,
@@ -228,6 +230,8 @@ const videoData = [
     pdf: '/pdfs/ENGD7.pdf ',
     description: 'get to know how to communicate',
     thumbnail: '/ED7.png',
+    handwrittenNotes: '/pdfs/eng4.pdf',
+    cred:"Aryan Mishra ",
   },
       {
     id: 21,
