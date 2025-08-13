@@ -242,6 +242,8 @@ const videoData = [
     pdf: '/pdfs/MD7.pdf ',
     description: 'just integration',
     thumbnail: '/MD7.png',
+    handwrittenNotes: '/pdfs/maths5.pdf',
+    cred:"Aryan Mishra ",
   },
 ];
 
