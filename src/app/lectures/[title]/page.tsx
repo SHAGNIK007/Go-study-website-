@@ -2,16 +2,24 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
 
-interface UserProfile {
-  username: string;
-  avatar_url: string;
+interface VideoData {
+  id: number;
+  title: string;
+  subject: string;
+  type: string;
+  youtubeUrl: string;
+  pdf: string;
+  description: string;
+  homework: string;
+  thumbnail: string;
+  handwrittenNotes: string;
+  cred: string;
 }
 
-const videoData = [
+const videoData: VideoData[] = [
   {
     id: 1,
     title: 'CS01: Introduction to algorithm',
@@ -36,6 +44,7 @@ const videoData = [
     homework: '',
     handwrittenNotes: '/pdfs/CS02.pdf',
     cred: "Aryan Mishra",
+    thumbnail:" "
   },
   {
     id: 3,
@@ -48,6 +57,7 @@ const videoData = [
     homework: '',
     handwrittenNotes: '',
     cred: "",
+    thumbnail:" "
   },
   {
     id: 4,
@@ -60,6 +70,7 @@ const videoData = [
     homework: '/M1.png',
     handwrittenNotes: '/pdfs/MAT01.pdf',
     cred: "Aryan Mishra",
+    thumbnail:" "
   },
   {
     id: 5,
@@ -72,6 +83,7 @@ const videoData = [
     homework: '/M2.png',
     handwrittenNotes: '/pdfs/MAT02.pdf',
     cred: "Aryan Mishra",
+    thumbnail:" "
   },
   {
     id: 6,
@@ -83,7 +95,10 @@ const videoData = [
     description: 'A lecture focused on improving active and passive listening skills.',
     handwrittenNotes: '',
     cred: "",
-  },{
+    thumbnail: " ",
+    homework: "",
+  },
+  {
     id: 7,
     title: 'ECE01: Fundementals of electrical and electronics engineering',
     subject: 'ECE',
@@ -92,8 +107,9 @@ const videoData = [
     pdf: '/pdfs/E2.pdf',
     description: 'Introduction to basics of electrical engineering , conductors , semiconductors , etc.',
     thumbnail: '/ECE1.png',
-     handwrittenNotes:"/pdfs/ec1.pdf",
-    cred:"Aryan Mishra",
+    handwrittenNotes: "/pdfs/ec1.pdf",
+    cred: "Aryan Mishra",
+    homework:""
   },
   {
     id: 8,
@@ -106,6 +122,7 @@ const videoData = [
     thumbnail: '/M3.png',
     handwrittenNotes: '/pdfs/MAT03.pdf',
     cred: "Aryan Mishra",
+    homework:""
   },
   {
     id: 9,
@@ -116,6 +133,9 @@ const videoData = [
     pdf: '',
     description: 'Functions fundementals',
     thumbnail: '/Mngm1.png',
+    handwrittenNotes: '',
+    cred: "",
+    homework:""
   },
   {
     id: 10,
@@ -126,8 +146,9 @@ const videoData = [
     pdf: '/pdfs/P1.pdf',
     description: 'Basics of electricity',
     thumbnail: '/P1.png',
-    handwrittenNotes:"/pdfs/Ph1.pdf",
+    handwrittenNotes: "/pdfs/Ph1.pdf",
     cred: "Aryan Mishra",
+    homework:""
   },
   {
     id: 11,
@@ -138,8 +159,9 @@ const videoData = [
     pdf: '/pdfs/EC2.pdf',
     description: 'Basics of electricity',
     thumbnail: '/ECE2.png',
-     handwrittenNotes:"/pdfs/ECE2.pdf",
-    cred:"Aryan Mishra"
+    handwrittenNotes: "/pdfs/ECE2.pdf",
+    cred: "Aryan Mishra",
+    homework:""
   },
   {
     id: 12,
@@ -150,20 +172,9 @@ const videoData = [
     pdf: '/pdfs/CHE01.pdf',
     description: 'Basic Chemistry',
     thumbnail: '/CHE01.png',
-    handwrittenNotes:"/pdfs/Che1.pdf",
-    cred:"Aryan Mishra"
-  },
-    {
-    id: 14,
-    title: 'CHEM02:Electrochemisty and chemical sensors',
-    subject: 'CHEMISTRY',
-    type: 'video',
-    youtubeUrl: 'https://www.youtube.com/embed/CmLfoYdtb9A',
-    pdf: '/pdfs/CHE02.pdf',
-    description: 'Electrochemistry and its use in chemical sensors',
-    thumbnail: '/CHE02.png',
-     handwrittenNotes:"/pdfs/Che2.pdf",
-    cred:"Aryan Mishra"
+    handwrittenNotes: "/pdfs/Che1.pdf",
+    cred: "Aryan Mishra",
+    homework:""
   },
   {
     id: 13,
@@ -174,8 +185,9 @@ const videoData = [
     pdf: '/pdfs/P3.pdf',
     description: 'Basics of Nano particles, Nanotech, Nano material and its importance',
     thumbnail: '/P3.png',
-    handwrittenNotes:"/pdfs/Ph2.pdf",
+    handwrittenNotes: "/pdfs/Ph2.pdf",
     cred: "Aryan Mishra",
+    homework:""
   },
   {
     id: 14,
@@ -186,7 +198,9 @@ const videoData = [
     pdf: '/pdfs/CHE02.pdf',
     description: 'Electrochemistry and its use in chemical sensors',
     thumbnail: '/CHE02.png',
-    cred: "",
+    handwrittenNotes: "/pdfs/Che2.pdf",
+    cred: "Aryan Mishra",
+    homework:""
   },
   {
     id: 15,
@@ -197,8 +211,11 @@ const videoData = [
     pdf: '/pdfs/Mngm02.pdf',
     description: 'some management stuff  u wont need anyways',
     thumbnail: '/Mngm2.png',
+    handwrittenNotes: '',
+    cred: "",
+    homework:""
   },
-   {
+  {
     id: 16,
     title: 'Math04: Derivatives',
     subject: 'MATHEMATICS',
@@ -207,8 +224,11 @@ const videoData = [
     pdf: 'no pdf for todays class',
     description: 'prof didnt have his mic turned ON',
     thumbnail: '/Mngm2.png',
+    handwrittenNotes: '',
+    cred: "",
+    homework:""
   },
-   {
+  {
     id: 17,
     title: 'E03: Indianism and common errors',
     subject: 'ENGLISH',
@@ -217,8 +237,11 @@ const videoData = [
     pdf: 'no pdf for todays class',
     description: 'get to know how to speak english',
     thumbnail: '/engd6.png',
+    handwrittenNotes: '',
+    cred: "",
+    homework:""
   },
-    {
+  {
     id: 18,
     title: 'CS03: Projects of seniors',
     subject: 'CSE',
@@ -227,6 +250,9 @@ const videoData = [
     pdf: 'no pdf for todays class',
     description: 'projects of seniors nothing to do anything with us',
     thumbnail: '/csd6.png',
+    handwrittenNotes: '',
+    cred: "",
+    homework:""
   },
   {
     id: 19,
@@ -238,9 +264,10 @@ const videoData = [
     description: 'some coding basics in python',
     thumbnail: '/CSD7.png',
     handwrittenNotes: '/pdfs/cse4.pdf',
-    cred:"Aryan Mishra ",
+    cred: "Aryan Mishra",
+    homework:""
   },
-      {
+  {
     id: 20,
     title: 'E04: Communication skills',
     subject: 'ENGLISH',
@@ -250,9 +277,10 @@ const videoData = [
     description: 'get to know how to communicate',
     thumbnail: '/ED7.png',
     handwrittenNotes: '/pdfs/eng4.pdf',
-    cred:"Aryan Mishra ",
+    cred: "Aryan Mishra",
+    homework:""
   },
-      {
+  {
     id: 21,
     title: 'Math05: Integration',
     subject: 'MATHEMATICS',
@@ -262,52 +290,20 @@ const videoData = [
     description: 'just integration',
     thumbnail: '/MD7.png',
     handwrittenNotes: '/pdfs/maths5.pdf',
-    cred:"Aryan Mishra ",
+    cred: "Aryan Mishra",
+    homework:""
   },
 ];
 
 export default function LecturePage() {
   const { title } = useParams();
   const pathname = usePathname();
-  const router = useRouter();
   const decodedTitle = decodeURIComponent(title as string);
   const currentIndex = videoData.findIndex((vid) => vid.title === decodedTitle);
   const videoInfo = videoData[currentIndex];
   const [progress, setProgress] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    async function fetchUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        let avatarUrl = '/default-avatar.png';
-        if (profile?.avatar_url) {
-          if (!profile.avatar_url.startsWith('http')) {
-            const filePath = profile.avatar_url.replace('avatar/', '');
-            const { data } = supabase.storage.from('avatar').getPublicUrl(filePath);
-            avatarUrl = data.publicUrl || '/default-avatar.png';
-          } else {
-            avatarUrl = profile.avatar_url;
-          }
-        }
-
-        setUser({
-          username: profile?.username || 'User',
-          avatar_url: avatarUrl,
-        });
-      }
-    }
-    fetchUser();
-  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem(`watch-${decodedTitle}`);
@@ -320,12 +316,6 @@ export default function LecturePage() {
       document.body.style.overflow = 'auto';
     };
   }, [isMenuOpen]);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    router.push('/login');
-  };
 
   if (!videoInfo) {
     return (
@@ -386,57 +376,6 @@ export default function LecturePage() {
             />
           </div>
 
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2"
-              >
-                <div className="relative w-10 h-10 rounded-full border border-[#D9A679] bg-[#FFF5E6] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <Image
-                    src={user.avatar_url}
-                    alt="avatar"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <span className="text-md text-[#5B4C3A] hidden font-bold md:block">{user.username}</span>
-              </button>
-
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 bg-[#FFF5E6] border border-[#D9A679] rounded-md shadow-md w-40 z-10 overflow-hidden">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
-                  >
-                    Edit Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="hidden md:flex gap-2">
-              <Link
-                href="/login"
-                className="px-3 py-1 bg-[#FFF5E6] border border-[#D9A679] text-sm text-[#5B4C3A] rounded-md hover:bg-[#FFE4C4] transition-all duration-300"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="px-3 py-1 bg-[#D15555] text-sm text-white rounded-md hover:bg-[#B44646] transition-all duration-300"
-              >
-                Signup
-              </Link>
-            </div>
-          )}
-
           <div className="md:hidden">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[#5B4C3A] focus:outline-none">
               <div className="w-6 h-5 flex flex-col justify-between">
@@ -476,26 +415,6 @@ export default function LecturePage() {
               </Link>
             );
           })}
-          {!user && (
-            <>
-              <Link href="/login" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
-                Login
-              </Link>
-              <Link href="/signup" className="block px-3 py-2 bg-[#D15555] text-sm text-white hover:bg-[#B44646] transition-colors duration-300 rounded-md">
-                Signup
-              </Link>
-            </>
-          )}
-          {user && (
-            <>
-              <Link href="/profile" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
-                Edit Profile
-              </Link>
-              <button onClick={handleLogout} className="block w-full px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md text-left">
-                Logout
-              </button>
-            </>
-          )}
         </div>
       </div>
 

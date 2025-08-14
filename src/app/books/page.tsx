@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabaseClient';
 
 interface Book {
   id: number;
@@ -17,11 +16,6 @@ interface Book {
   released: string;
   publisher: string;
   format: string;
-}
-
-interface UserProfile {
-  username: string;
-  avatar_url: string;
 }
 
 const books: Book[] = [
@@ -106,45 +100,10 @@ export default function BooksPage() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [bookmarked, setBookmarked] = useState<number[]>([]);
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    async function fetchUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        let avatarUrl = '/default-avatar.png';
-        if (profile?.avatar_url) {
-          if (!profile.avatar_url.startsWith('http')) {
-            const filePath = profile.avatar_url.replace('avatar/', '');
-            const { data } = supabase.storage.from('avatar').getPublicUrl(filePath);
-            avatarUrl = data.publicUrl || '/default-avatar.png';
-          } else {
-            avatarUrl = profile.avatar_url;
-          }
-        }
-
-        setUser({
-          username: profile?.username || 'User',
-          avatar_url: avatarUrl,
-        });
-      }
-    }
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-
     if (typeof window !== 'undefined') {
       const savedBookmarks = JSON.parse(localStorage.getItem('bookmarked') || '[]');
       setBookmarked(savedBookmarks);
@@ -152,7 +111,6 @@ export default function BooksPage() {
   }, []);
 
   useEffect(() => {
-
     if (typeof window !== 'undefined') {
       localStorage.setItem('bookmarked', JSON.stringify(bookmarked));
     }
@@ -162,12 +120,6 @@ export default function BooksPage() {
     setBookmarked((prev: number[]) =>
       prev.includes(id) ? prev.filter((bid: number) => bid !== id) : [...prev, id]
     );
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    router.push('/login');
   };
 
   const filteredBooks =
@@ -191,7 +143,7 @@ export default function BooksPage() {
         <Link
           href="/"
           className="text-lg font-semibold text-[#D15555] hover:text-[#B44646] transition-colors duration-300"
-            style={{ fontFamily: "'Press Start 2P', cursive" }}
+          style={{ fontFamily: "'Press Start 2P', cursive" }}
         >
           GOSTUDY.COM
         </Link>
@@ -226,57 +178,6 @@ export default function BooksPage() {
               className="border border-[#D9A679] bg-[#FFF5E6] rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#D15555] transition-all duration-300"
             />
           </div>
-
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2"
-              >
-                <div className="relative w-8 h-8 rounded-full border border-[#D9A679] bg-[#FFF5E6] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <Image
-                    src={user.avatar_url}
-                    alt="avatar"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <span className="text-sm text-[#5B4C3A] hidden md:block">{user.username}</span>
-              </button>
-
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 bg-[#FFF5E6] border border-[#D9A679] rounded-md shadow-md w-40 z-10 overflow-hidden">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
-                  >
-                    Edit Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="hidden md:flex gap-2">
-              <Link
-                href="/login"
-                className="px-3 py-1 bg-[#FFF5E6] border border-[#D9A679] text-sm text-[#5B4C3A] rounded-md hover:bg-[#FFE4C4] transition-all duration-300"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="px-3 py-1 bg-[#D15555] text-sm text-white rounded-md hover:bg-[#B44646] transition-all duration-300"
-              >
-                Signup
-              </Link>
-            </div>
-          )}
 
           <div className="md:hidden">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[#5B4C3A] focus:outline-none">
@@ -317,26 +218,6 @@ export default function BooksPage() {
               </Link>
             );
           })}
-          {!user && (
-            <>
-              <Link href="/login" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
-                Login
-              </Link>
-              <Link href="/signup" className="block px-3 py-2 bg-[#D15555] text-sm text-white hover:bg-[#B44646] transition-colors duration-300 rounded-md">
-                Signup
-              </Link>
-            </>
-          )}
-          {user && (
-            <>
-              <Link href="/profile" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
-                Edit Profile
-              </Link>
-              <button onClick={handleLogout} className="block w-full px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md text-left">
-                Logout
-              </button>
-            </>
-          )}
         </div>
       </div>
 

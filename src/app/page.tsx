@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
 
 interface Resource {
   id: number;
@@ -17,11 +16,6 @@ interface Resource {
   homework?: string;
   thumbnail?: string;
   cred?: string;
-}
-
-interface UserProfile {
-  username: string;
-  avatar_url: string;
 }
 
 const categories = ['CSE', 'ECE', 'MATHEMATICS', 'ENGLISH', 'PHYSICS', 'CHEMISTRY', 'MANAGEMENT'];
@@ -247,40 +241,8 @@ export default function Home() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState('CSE');
   const [resources, setResources] = useState<Resource[]>([]);
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    async function fetchUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        let avatarUrl = '/default-avatar.png';
-        if (profile?.avatar_url) {
-          if (!profile.avatar_url.startsWith('http')) {
-            const filePath = profile.avatar_url.replace('avatar/', '');
-            const { data } = supabase.storage.from('avatar').getPublicUrl(filePath);
-            avatarUrl = data.publicUrl || '/default-avatar.png';
-          } else {
-            avatarUrl = profile.avatar_url;
-          }
-        }
-
-        setUser({
-          username: profile?.username || 'User',
-          avatar_url: avatarUrl,
-        });
-      }
-    }
-    fetchUser();
-  }, []);
 
   useEffect(() => {
     let filtered = resourcesData.filter((item) => item.subject === selectedCategory);
@@ -293,25 +255,18 @@ export default function Home() {
     setResources(filtered);
   }, [selectedCategory, searchTerm]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    router.push('/login');
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-[#FFEDD5] text-black font-sans antialiased">
    
       <header className="w-full px-4 md:px-8 py-3 flex justify-between items-center border-b border-[#E2B991] bg-[#F7E6D4] shadow-sm">
- 
         <Link
           href="/"
-          className="text-lg font-semibold text-[#D15555] hover:text-[#B44646] transition-colors duration-300"style={{ fontFamily: "'Press Start 2P', cursive" }}
+          className="text-lg font-semibold text-[#D15555] hover:text-[#B44646] transition-colors duration-300"
+          style={{ fontFamily: "'Press Start 2P', cursive" }}
         >
           GOSTUDY.COM
         </Link>
 
-        
         <nav className="hidden md:flex space-x-6 text-md font-medium">
           {['Home', 'Lectures', 'Books', 'Notes'].map((link) => {
             const href = link === 'Home' ? '/' : `/${link.toLowerCase()}`;
@@ -332,9 +287,7 @@ export default function Home() {
           })}
         </nav>
 
-       
         <div className="flex items-center gap-3">
-          
           <div className="hidden md:block">
             <input
               type="text"
@@ -346,59 +299,6 @@ export default function Home() {
             />
           </div>
 
-
-          {user ? (
-            <div className="relative">
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="flex items-center gap-2"
-              >
-                <div className="relative w-10 h-10 rounded-full cursor-pointer border border-[#D9A679] bg-[#FFF5E6] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
-                  <Image
-                    src={user.avatar_url}
-                    alt="avatar"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <span className="text-md font-bold text-[#5B4C3A] hidden md:block">{user.username}</span>
-              </button>
-
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 bg-[#FFF5E6] border border-[#D9A679] rounded-md shadow-md w-40 z-10 overflow-hidden">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
-                  >
-                    Edit Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-[#5B4C3A] hover:bg-[#FFE4C4] transition-colors duration-200"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="hidden md:flex gap-2">
-              <Link
-                href="/login"
-                className="px-3 py-1 bg-[#FFF5E6] border border-[#D9A679] text-sm text-[#5B4C3A] rounded-md hover:bg-[#FFE4C4] transition-all duration-300"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="px-3 py-1 bg-[#D15555] text-sm text-white rounded-md hover:bg-[#B44646] transition-all duration-300"
-              >
-                Signup
-              </Link>
-            </div>
-          )}
-
- 
           <div className="md:hidden">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[#5B4C3A] focus:outline-none">
               <div className="w-6 h-5 flex flex-col justify-between">
@@ -411,7 +311,6 @@ export default function Home() {
         </div>
       </header>
 
-     
       <div
         className={`md:hidden bg-[#FFF5E6] border-b border-[#D9A679] overflow-hidden transition-all duration-300 ease-in-out ${
           isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
@@ -438,32 +337,10 @@ export default function Home() {
               </Link>
             );
           })}
-          {!user && (
-            <>
-              <Link href="/login" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
-                Login
-              </Link>
-              <Link href="/signup" className="block px-3 py-2 bg-[#D15555] text-sm text-white hover:bg-[#B44646] transition-colors duration-300 rounded-md">
-                Signup
-              </Link>
-            </>
-          )}
-          {user && (
-            <>
-              <Link href="/profile" className="block px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md">
-                Edit Profile
-              </Link>
-              <button onClick={handleLogout} className="block w-full px-3 py-2 text-sm hover:bg-[#FFE4C4] transition-colors duration-300 rounded-md text-left">
-                Logout
-              </button>
-            </>
-          )}
         </div>
       </div>
 
- 
       <main className="flex-1 container mx-auto p-4 md:p-6">
-      
         <div className="flex flex-wrap gap-2 justify-center mb-6">
           {categories.map((cat) => (
             <button
@@ -478,7 +355,6 @@ export default function Home() {
           ))}
         </div>
 
-       
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {resources.map((item) => (
             <div
@@ -506,7 +382,6 @@ export default function Home() {
         </div>
       </main>
 
-  
       <footer className="w-full bg-[#F7E6D4] text-[#5B4C3A] p-3 text-center border-t border-[#E2B991] shadow-sm mt-auto">
         <p className="text-sm font-medium">Made For VIT-AP study resources | v1.1</p>
         <p className="text-sm font-medium">Made With ❤️ by Srijoy & Shagnik (1st Year Students)</p>
