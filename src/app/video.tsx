@@ -25,7 +25,7 @@ export default function LecturePage() {
         <div className="mt-6 px-2 md:px-4">
           <h2 className="text-lg md:text-xl font-semibold mb-2">Description</h2>
           <p className="text-sm md:text-base text-gray-800">
-            This is a detailed video lecture on <strong>{title}</strong>.for any querry solve it urself dont contact me
+            This is a detailed video lecture on <strong>{title}</strong>.for any doubts solve it yourself dont contact us.
           </p>
         </div>
       </div>
