@@ -225,7 +225,7 @@ const resourcesData: Resource[] = [
     thumbnail: '/ED7.png',
   },
       {
-    id: 21,
+    id: 22,
     title: 'Math05: Integration',
     subject: 'MATHEMATICS',
     type: 'video',
@@ -233,6 +233,27 @@ const resourcesData: Resource[] = [
     pdf: '/pdfs/MD7.pdf ',
     description: 'just integration',
     thumbnail: '/MD7.png',
+  },
+
+          {
+    id: 23,
+    title: 'MANGEMENT03: Financial literacy for young engineers',
+    subject: 'MANAGEMENT',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/nB3F6qrUXUM',
+    pdf:  " ",
+    description: 'some management bullshit ( what literacy , engineers wont get any money only bro hahaha! )',
+    thumbnail: '/MD7.png',
+  },
+            {
+    id: 24,
+    title: 'ECE03: ELECTRICITY ',
+    subject: 'ECE',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/BQfoWHaSm3s',
+    pdf:  " ",
+    description: 'Probability And statisticsX',
+    thumbnail: '/E4.png',
   },
 ];
 
