@@ -255,6 +255,37 @@ const resourcesData: Resource[] = [
     description: 'Probability And statisticsX',
     thumbnail: '/E4.png',
   },
+              {
+    id: 25,
+    title: 'CS05: algorithms in python ',
+    subject: 'CSE',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/toqbWy8Q9go',
+    pdf:  "no slide ",
+    description: 'some python shit',
+    thumbnail: '/CSD8.png',
+  },
+       {
+    id: 26,
+    title: 'Math05: maxima and minima',
+    subject: 'MATHEMATICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/cWEUaY__jd8',
+    pdf: 'no slides ',
+    description: 'Finding maxima minima , fermats theorem ',
+    thumbnail: '/MD8.png',
+  },
+     {
+    id: 27,
+    title: 'E05:  writing right',
+    subject: 'ENGLISH',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/HIUgSyZfQnw',
+    pdf: ' no slides',
+    description: 'get to know how to write english',
+    thumbnail: '/END07.png',
+  },
+  
 ];
 
 export default function Home() {
