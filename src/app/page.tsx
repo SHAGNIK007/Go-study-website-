@@ -346,8 +346,37 @@ const resourcesData: Resource[] = [
     description: 'Introduction to accounting',
     thumbnail: '/Mngm3.png',
   },
-  
-  
+  {
+    id: 34,
+    title: 'Phy04:Optics',
+    subject: 'PHYSICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/Hd_jrZ1lyls',
+    pdf: '/pdfs/PD8.ppt',
+    description: 'OPTICS',
+    thumbnail: '/PH08.png',
+  },
+  {
+    id: 35,
+    title: 'CHE03: Air Pollution and the Engineer Role in Sustainability',
+    subject: 'CHEMISTRY',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/hB1oSuZg6NU',
+    pdf: '',
+    description: 'something with air pollution',
+    thumbnail: '/CHE08.png',
+  },
+  {
+    id: 36,
+    title: 'ECE04: Cells',
+    subject: 'CHEMISTRY',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/hB1oSuZg6NU',
+    pdf: '',
+    description: 'CELLS',
+    thumbnail: '/EC08.png',
+  },
+    
 ];
 
 export default function Home() {
