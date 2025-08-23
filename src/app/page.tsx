@@ -366,16 +366,46 @@ const resourcesData: Resource[] = [
     description: 'something with air pollution',
     thumbnail: '/CHE08.png',
   },
-  {
+ {
     id: 36,
     title: 'ECE04: Cells',
-    subject: 'CHEMISTRY',
+    subject: 'ECE',
     type: 'video',
     youtubeUrl: 'https://www.youtube.com/embed/hB1oSuZg6NU',
     pdf: '',
     description: 'CELLS',
     thumbnail: '/EC08.png',
+ },
+     {
+    id: 37,
+    title: 'CHEM04: Air Pollution',
+    subject: 'CHEMISTRY',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/KHfD9SVSdwg',
+    pdf: '',
+    description: 'Breate oxygen',
+    thumbnail: '/D13C.png',
+     }, 
+  {
+    id: 38,
+    title: 'Phy05: Optics pt2',
+    subject: 'PHYSICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/Dmm16vm8A1g',
+    pdf: '',
+    description: 'Mirrors and lenses',
+    thumbnail: '/D13P.png',
   },
+    {
+    id: 39,
+    title: 'MANAGEMENT05: Supply chain management ',
+    subject: 'MANAGEMENT',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/ij5TIiYi9UY',
+    pdf: '',
+    description: 'All about supply chain',
+    thumbnail: '/D13MG.png',
+    },
     
 ];
 
