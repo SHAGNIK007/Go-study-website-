@@ -376,6 +376,36 @@ const resourcesData: Resource[] = [
     description: 'CELLS',
     thumbnail: '/EC08.png',
   },
+    {
+    id: 37,
+    title: 'CS07: Levels of Data representation',
+    subject: 'CSE',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/ONqlCnptOP0',
+    pdf: '',
+    description: 'Data structure',
+    thumbnail: '/CS08.png',
+  },
+     {
+    id: 38,
+    title: 'MATH08: partial derivative ',
+    subject: 'MATHEMATICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/t4XnYgFvgcI',
+    pdf: '',
+    description: 'Partial derivatives and chain rule',
+    thumbnail: '/M09.png',
+  },
+       {
+    id: 40,
+    title: 'E06: EMAIL ERRORS ',
+    subject: 'ENGLISH',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/t4XnYgFvgcI',
+    pdf: '',
+    description: 'Addressing email errors as a beginner',
+    thumbnail: '/E06.png',
+  },
     
 ];
 
