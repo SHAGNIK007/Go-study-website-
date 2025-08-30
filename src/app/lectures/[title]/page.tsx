@@ -607,6 +607,46 @@ const videoData: VideoData[] = [
     cred:"",
     homework:""
   },
+         {
+    id: 43,
+    title: 'CHEM05: Industrial Chemsitry for Engineers',
+    subject: 'CHEMISTRY',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/Zl_JAkWWhb8',
+    pdf: '',
+    description: 'Industrial engineering',
+    thumbnail: '/C6.png',
+               handwrittenNotes:"",
+    cred:"",
+    homework:""
+  },
+          {
+    id: 44,
+    title: 'ECE05: CMOS VLSI DESIGN',
+    subject: 'ECE',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/MrM-pNqJptg',
+    pdf: '',
+    description: 'CMOS VLSI DESIGN',
+    thumbnail: '/E5.png',
+               handwrittenNotes:"",
+    cred:"",
+    homework:""
+  },
+            {
+    id: 45,
+    title: 'Phy06: Laws of thermodynamics',
+    subject: 'PHYSICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/I1enDFwK9Bs',
+    pdf: '',
+    description: 'CMOS VLSI DESIGN',
+    thumbnail: '/P5.png',
+               handwrittenNotes:"",
+    cred:"",
+    homework:""
+  },
+    
 ];
 
 export default function LecturePage() {

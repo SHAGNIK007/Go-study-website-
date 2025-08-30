@@ -438,6 +438,36 @@ const resourcesData: Resource[] = [
     description: 'Addressing email errors as a beginner',
     thumbnail: '/E06.png',
   },
+         {
+    id: 43,
+    title: 'CHEM05: Industrial Chemsitry for Engineers',
+    subject: 'CHEMISTRY',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/Zl_JAkWWhb8',
+    pdf: '',
+    description: 'Industrial engineering',
+    thumbnail: '/C6.png',
+  },
+          {
+    id: 44,
+    title: 'ECE05: CMOS VLSI DESIGN',
+    subject: 'ECE',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/MrM-pNqJptg',
+    pdf: '',
+    description: 'CMOS VLSI DESIGN',
+    thumbnail: '/E5.png',
+  },
+            {
+    id: 45,
+    title: 'Phy06: Laws of thermodynamics',
+    subject: 'PHYSICS',
+    type: 'video',
+    youtubeUrl: 'https://www.youtube.com/embed/I1enDFwK9Bs',
+    pdf: '',
+    description: 'CMOS VLSI DESIGN',
+    thumbnail: '/P5.png',
+  },
     
 ];
 
